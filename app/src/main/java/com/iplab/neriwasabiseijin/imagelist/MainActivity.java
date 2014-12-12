@@ -1,39 +1,23 @@
 package com.iplab.neriwasabiseijin.imagelist;
 
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
 import android.widget.GridView;
-
-import java.util.ArrayList;
 
 
 public class MainActivity extends ActionBarActivity {
-
+/*
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ArrayList<String> list = new ArrayList<String>();
+        ArrayList<Bitmap> list = loadThumbnails();
 
-        list.add("A");
-        list.add("B");
-        list.add("C");
-        list.add("D");
-        list.add("E");
-        list.add("F");
-        list.add("G");
-        list.add("H");
-        list.add("I");
-        list.add("J");
-        list.add("K");
-        list.add("L");
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-                getApplicationContext(), android.R.layout.simple_list_item_1, list
+        BitmapAdapter adapter = new BitmapAdapter(
+                getApplicationContext(),R.layout.list_item,list
         );
 
         GridView gridView = (GridView)findViewById(R.id.gridView1);
@@ -41,6 +25,30 @@ public class MainActivity extends ActionBarActivity {
 
     }
 
+    private ArrayList<Bitmap> loadThumbnails(){
+        ArrayList<Bitmap> list = new ArrayList<Bitmap>();
+        ContentResolver cr = getContentResolver();
+        Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+        Cursor c = cr.query(uri, null, null, null, null);
+        c.moveToFirst();
+        int count = (100<c.getCount()) ? 100 : c.getCount();
+        for(int i=0; i<count; i++) {
+            long id = c.getLong(c.getColumnIndexOrThrow("_id"));
+            Bitmap bmp = MediaStore.Images.Thumbnails.getThumbnail(cr, id, MediaStore.Images.Thumbnails.MINI_KIND ,null);
+            list.add(bmp);
+            c.moveToNext();
+        }
+        return list;
+    }
+*/
+    @Override
+    protected void onCreate(Bundle savedInstanceState){
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        GridView gridView = (GridView)findViewById(R.id.gridView1);
+        gridView.setAdapter(new HueAdapter(this));
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

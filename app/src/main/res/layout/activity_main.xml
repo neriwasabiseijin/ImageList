@@ -3,17 +3,21 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000"
+    android:background="#FFFFFF"
+    android:paddingTop="8dp"
     tools:context=".MainActivity">
 
     <GridView
         android:id="@+id/gridView1"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:numColumns="4"
-        android:verticalSpacing="10dp">
-
+        android:columnWidth="100dp"
+        android:minHeight="100dp"
+        android:numColumns="auto_fit"
+        android:verticalSpacing="8dp"
+        android:horizontalSpacing="8dp"
+        android:stretchMode="columnWidth"
+        android:gravity="center"
+        >
     </GridView>
-
-
 </LinearLayout>
