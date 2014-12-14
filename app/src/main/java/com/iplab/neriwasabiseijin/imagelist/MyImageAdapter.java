@@ -69,14 +69,14 @@ public class MyImageAdapter extends BaseAdapter{
             convertView = mLayoutInflater.inflate(R.layout.list_item, null);
             holder = new ViewHolder();
             holder.myImageView = (ImageView)convertView.findViewById(R.id.list_imageview);
-            holder.myCheckBox = (CheckBox)convertView.findViewById(R.id.list_selected);
+            //holder.myCheckBox = (CheckBox)convertView.findViewById(R.id.list_selected);
             convertView.setTag(holder);
         }else{
             holder = (ViewHolder)convertView.getTag();
         }
 
         holder.myImageView.setImageBitmap(mImageArray.get(position));
-        holder.myCheckBox.setChecked(true);
+       // holder.myCheckBox.setChecked(true);
 
         return convertView;
     }
@@ -142,5 +142,4 @@ public class MyImageAdapter extends BaseAdapter{
 
         return list;
     }
-
 }

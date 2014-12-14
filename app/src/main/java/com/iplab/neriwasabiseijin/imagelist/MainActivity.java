@@ -29,8 +29,6 @@ public class MainActivity extends ActionBarActivity {
         debugFlag = false;
         setTestMode();
 
-
-
         actionBar = getSupportActionBar();
         actionBar.setTitle("ImageGridView");
 
@@ -68,6 +66,7 @@ public class MainActivity extends ActionBarActivity {
         if(testMode == TEST_LONG){
             setContentView(R.layout.activity_main_long);
             myGridView_LongTap gridView_longTap = (myGridView_LongTap)findViewById(R.id.myGridView_longTap);
+            //GridView gridView_longTap = (GridView)findViewById(R.id.myGridView_longTap);
             gridView_longTap.setAdapter(new MyImageAdapter(this));
         }else{
             GridView gridView = (GridView)findViewById(R.id.myGridView);

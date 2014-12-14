@@ -5,7 +5,6 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.CheckBox;
 import android.widget.GridView;
 import android.widget.ListAdapter;
 
@@ -23,11 +22,13 @@ public class myGridView_LongTap extends GridView{
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 setSelection(position);
                 Log.i("longtap", position + "");
-                CheckBox c = (CheckBox) findViewById(R.id.list_selected);
-                c.setChecked(true);
+
+               // CheckBox c = (CheckBox) findViewById(R.id.list_selected);
+                //c.setChecked(true);
                 return true;
             }
         });
+
         setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -36,6 +37,7 @@ public class myGridView_LongTap extends GridView{
 
             }
         });
+
     }
 
     @Override
