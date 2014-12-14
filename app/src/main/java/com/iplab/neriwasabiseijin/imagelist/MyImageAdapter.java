@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 
 import java.io.File;
@@ -37,8 +38,10 @@ public class MyImageAdapter extends BaseAdapter{
             R.drawable.hue_ff40cf,
     };
     private ArrayList<Bitmap> mImageArray;
+
     private static class ViewHolder{
         public ImageView myImageView;
+        public CheckBox myCheckBox;
     }
 
     public MyImageAdapter(Context context){
@@ -63,15 +66,17 @@ public class MyImageAdapter extends BaseAdapter{
         ViewHolder holder;
 
         if(convertView == null){
-            convertView = mLayoutInflater.inflate(R.layout.grid_item_hue, null);
+            convertView = mLayoutInflater.inflate(R.layout.list_item, null);
             holder = new ViewHolder();
-            holder.myImageView = (ImageView)convertView.findViewById(R.id.hue_imageview);
+            holder.myImageView = (ImageView)convertView.findViewById(R.id.list_imageview);
+            holder.myCheckBox = (CheckBox)convertView.findViewById(R.id.list_selected);
             convertView.setTag(holder);
         }else{
             holder = (ViewHolder)convertView.getTag();
         }
 
         holder.myImageView.setImageBitmap(mImageArray.get(position));
+        holder.myCheckBox.setChecked(true);
 
         return convertView;
     }
@@ -79,51 +84,59 @@ public class MyImageAdapter extends BaseAdapter{
     private ArrayList<Bitmap> loadThumbnails(){
         ArrayList<Bitmap> list = new ArrayList<Bitmap>();
 
+
         String sd_root = Get_SDroot.getMount_sd();
         File dir = new File(sd_root+"/IPLAB/img");
         File[] imgs = dir.listFiles();
-        if(imgs != null){
-            for(int i=0; i<imgs.length; i++){
-                if(imgs[i].isFile()){
-                    try{
-                        // もし画像が大きかったら縮小して読み込む
-                        Bitmap bitmap;
-                        FileInputStream fis = new FileInputStream(imgs[i]);
-                        BitmapFactory.Options imageOptions = new BitmapFactory.Options();
-                        imageOptions.inJustDecodeBounds = true;
-                        BitmapFactory.decodeStream(fis, null, imageOptions);
-                        fis.close();
 
-                        fis = new FileInputStream(imgs[i]);
+        if(!MainActivity.debugFlag) {
+            if (imgs != null) {
+                for (int i = 0; i < imgs.length; i++) {
+                    if (imgs[i].isFile()) {
+                        try {
+                            // もし画像が大きかったら縮小して読み込む
+                            Bitmap bitmap;
+                            FileInputStream fis = new FileInputStream(imgs[i]);
+                            BitmapFactory.Options imageOptions = new BitmapFactory.Options();
+                            imageOptions.inJustDecodeBounds = true;
+                            BitmapFactory.decodeStream(fis, null, imageOptions);
+                            fis.close();
 
-                        int imageSizeMax = 80;
-                        float imageScaleWidth = (float)imageOptions.outWidth / imageSizeMax;
-                        float imageScaleHeight = (float)imageOptions.outHeight / imageSizeMax;
+                            fis = new FileInputStream(imgs[i]);
 
-                        // 縮小できるサイズならば，縮小して読み込む
-                        if(imageScaleWidth > 2 && imageScaleHeight > 2){
-                            BitmapFactory.Options imageOptions2 = new BitmapFactory.Options();
-                            // 縦横，小さい方に縮小するスケールを合わせる
-                            int imageScale = (int)Math.floor((imageScaleWidth>imageScaleHeight ? imageScaleHeight:imageScaleWidth));
-                            // BitmapFactory.OptionsのinSampleSizeには2のべき乗が入る
-                            // imageScaleに最も近く，それ以下の2のべき乗の数を探す
-                            for(int j=2; j<=imageScale; j*=2){
-                                imageOptions2.inSampleSize = j;
+                            int imageSizeMax = 80;
+                            float imageScaleWidth = (float) imageOptions.outWidth / imageSizeMax;
+                            float imageScaleHeight = (float) imageOptions.outHeight / imageSizeMax;
+
+                            // 縮小できるサイズならば，縮小して読み込む
+                            if (imageScaleWidth > 2 && imageScaleHeight > 2) {
+                                BitmapFactory.Options imageOptions2 = new BitmapFactory.Options();
+                                // 縦横，小さい方に縮小するスケールを合わせる
+                                int imageScale = (int) Math.floor((imageScaleWidth > imageScaleHeight ? imageScaleHeight : imageScaleWidth));
+                                // BitmapFactory.OptionsのinSampleSizeには2のべき乗が入る
+                                // imageScaleに最も近く，それ以下の2のべき乗の数を探す
+                                for (int j = 2; j <= imageScale; j *= 2) {
+                                    imageOptions2.inSampleSize = j;
+                                }
+
+                                bitmap = BitmapFactory.decodeStream(fis, null, imageOptions2);
+                                Log.v("image", "Sample Size: 1/" + imageOptions2.inSampleSize);
+                            } else {
+                                bitmap = BitmapFactory.decodeStream(fis);
                             }
-
-                            bitmap = BitmapFactory.decodeStream(fis, null, imageOptions2);
-                            Log.v("image", "Sample Size: 1/" + imageOptions2.inSampleSize);
-                        }else{
-                            bitmap = BitmapFactory.decodeStream(fis);
+                            fis.close();
+                            list.add(bitmap);
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
-                        fis.close();
-                        list.add(bitmap);
-                    }catch(FileNotFoundException e){
-                        e.printStackTrace();
-                    }catch(IOException e){
-                        e.printStackTrace();
                     }
                 }
+            }
+        }else{
+            for (int i = 0; i < imgs.length; i++) {
+                list.add(BitmapFactory.decodeResource(mContext.getResources(), mHueIdArray[i % mHueIdArray.length]));
             }
         }
 
