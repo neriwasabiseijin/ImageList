@@ -1,8 +1,8 @@
 package com.iplab.neriwasabiseijin.imagelist;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
@@ -13,18 +13,32 @@ import android.widget.ListAdapter;
  */
 public class myGridView_LongTap extends GridView{
 
+    public boolean[] selectedItem;
+    private MainActivity myMainActivity;
+
     public myGridView_LongTap(Context context, AttributeSet attrs) {
         super(context, attrs);
-        Log.i("longtap", "hogeeeeeeeee");
+        myInit(context);
+    }
+
+    @Override
+    public void setAdapter(ListAdapter adapter) {
+        super.setAdapter(adapter);
+    }
+
+    // 初期化
+    private void myInit(Context context){
+        myMainActivity = (MainActivity)context;
+        myMainActivity.setSelectionMode(MainActivity.MODE_NORMAL);
 
         setOnItemLongClickListener(new OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                setSelection(position);
-                Log.i("longtap", position + "");
-
-               // CheckBox c = (CheckBox) findViewById(R.id.list_selected);
-                //c.setChecked(true);
+                if (myMainActivity.checkSelectionMode(MainActivity.MODE_NORMAL)) {
+                    myMainActivity.setSelectionMode(MainActivity.MODE_SELECTION);
+                    view.setBackgroundColor(Color.rgb(80, 80, 240));
+                    setItemSelectedState(position, true, view);
+                }
                 return true;
             }
         });
@@ -32,17 +46,30 @@ public class myGridView_LongTap extends GridView{
         setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                setSelection(position);
-                Log.i("tap", position + "");
-
+                if(myMainActivity.checkSelectionMode(MainActivity.MODE_SELECTION)){
+                    if(!getItemSelectedState(position)) {
+                        setItemSelectedState(position, true, view);
+                    }else{
+                        setItemSelectedState(position, false, view);
+                    }
+                }
             }
         });
-
     }
 
-    @Override
-    public void setAdapter(ListAdapter adapter) {
-        super.setAdapter(adapter);
+    public void setSelectedItemLength(){
+        selectedItem = new boolean[this.getCount()];
+    }
+    public void setItemSelectedState(int position, boolean state, View itemView){
+        selectedItem[position] = state;
+        if(state){
+            itemView.setBackgroundColor(Color.rgb(80, 80, 240));
+        }else{
+            itemView.setBackgroundColor(Color.argb(0, 0, 0, 0));
+        }
+    }
+    public boolean getItemSelectedState(int position){
+        return selectedItem[position];
     }
 
 }

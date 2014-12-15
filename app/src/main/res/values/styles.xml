@@ -5,4 +5,7 @@
         <!-- Customize your theme here. -->
     </style>
 
+    <color name="action_bar_bg_black">#222222</color>
+    <color name="action_bar_bg_blue">#4444ff</color>
+
 </resources>

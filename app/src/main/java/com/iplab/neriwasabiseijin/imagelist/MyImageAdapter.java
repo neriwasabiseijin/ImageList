@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 public class MyImageAdapter extends BaseAdapter{
     private Context mContext;
     private LayoutInflater mLayoutInflater;
+    private MainActivity myMainActivity;
     private String[] mHueArray = {
             "FF4040", "FFCF40", "9FFF40", "40FF6F",
             "40FFFF", "406FFF", "9F40FF", "FF40CF"
@@ -48,6 +50,7 @@ public class MyImageAdapter extends BaseAdapter{
         mContext = context;
         mLayoutInflater = LayoutInflater.from(context);
         mImageArray = loadThumbnails();
+        myMainActivity = (MainActivity)context;
     }
 
     public int getCount(){
@@ -62,7 +65,7 @@ public class MyImageAdapter extends BaseAdapter{
         return position;
     }
 
-    public View getView(int position, View convertView, ViewGroup parent){
+    public View getView(final int position, View convertView, final ViewGroup parent){
         ViewHolder holder;
 
         if(convertView == null){
@@ -77,6 +80,31 @@ public class MyImageAdapter extends BaseAdapter{
 
         holder.myImageView.setImageBitmap(mImageArray.get(position));
        // holder.myCheckBox.setChecked(true);
+        convertView.setId(position);
+        convertView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent ev) {
+                myMainActivity.touchItem = position;
+                Log.i("toucitem", ""+position+"\n"+v.getLeft()+","+v.getTop()+","+v.getRight()+","+v.getBottom());
+                /*
+                // return true するとMOVEが渡せるけど下のviewにイベントは流れない
+                int action = ev.getActionMasked();
+                switch(action){
+                    case MotionEvent.ACTION_DOWN:
+                        return true;
+                    case MotionEvent.ACTION_MOVE:
+                        if(ev.getPointerCount() == 1) {
+                            PointF touchPos = new PointF(ev.getX(), ev.getY());
+                            RectF viewRect = new RectF(v.getLeft(),v.getLeft(),v.getLeft(),v.getLeft());
+                            if(viewRect.contains(touchPos.x, touchPos.y)){
+                                return true;
+                            }
+                        }
+                }
+                */
+                return false;
+            }
+        });
 
         return convertView;
     }
