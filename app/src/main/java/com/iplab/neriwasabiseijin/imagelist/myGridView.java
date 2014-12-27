@@ -3,6 +3,7 @@ package com.iplab.neriwasabiseijin.imagelist;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PointF;
+import android.graphics.RectF;
 import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ListAdapter;
+import android.widget.RelativeLayout;
 
 /**
  * Created by neriwasabiseijin on 2014/12/14.
@@ -32,8 +34,7 @@ public class myGridView extends GridView{
     private int selectionStartItem;
     private int selectionEndItem;
 
-    // 選択された場所を保存
-    public boolean[] selectedItem;
+    private boolean[] tmpSelectItem;
 
     // 一行の画像の数
     public int columnNum = 0;
@@ -41,29 +42,52 @@ public class myGridView extends GridView{
     public myGridView(Context context, AttributeSet attrs) {
         super(context, attrs);
         myInit(context);
+
+
     }
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus){
         super.onWindowFocusChanged(hasFocus);
         columnNum = getColumnNum();
+
+        //myMainActivity.selectedItemView = new ArrayList<Object>();
+        /*
+        for(int i=0; i<this.getCount(); i++){
+            myMainActivity.selectedItemView.add(this.getItemAtPosition(0));
+            Log.i("getitem", "count:"+this.getCount()+","+i);
+        }
+        */
+
+        for(int i=0; i<this.getCount(); i++){
+            //RelativeLayout r = (RelativeLayout)myMainActivity.selectedItemView.get(i);
+            RelativeLayout r = (RelativeLayout) this.getItemAtPosition(i);
+            setItemSelectedState(i, false, r);
+        }
+
+
     }
-
-
 
 
     @Override
     public boolean onTouchEvent(MotionEvent ev){
         touchPos = new PointF(ev.getX(), ev.getY());
+
+        /*
+        RelativeLayout r = (RelativeLayout)getItemAtPosition(mGetNowMoveItem(touchPos));
+        setItemSelectedState(0, true, r);
+        */
+
+
         setMyPointerId(ev);
         if(myGridViewTouchEvent(ev)) {
             return super.onTouchEvent(ev);
         }
-        return false;
+        return true;
     }
 
     // 初期化
-    private void myInit(Context context){
+    public void myInit(Context context){
         myMainActivity = (MainActivity)context;
         myMainActivity.setSelectionMode(MainActivity.MODE_NORMAL);
         holdFlag = false;
@@ -175,6 +199,9 @@ public class myGridView extends GridView{
             }
             return true;
         }else if(myMainActivity.checkSelectionMode(MainActivity.MODE_SELECTION)){
+            if (count == HOLDFINGER) {
+                holdFlag = true;
+            }
             return false;
         }
         return true;
@@ -185,15 +212,27 @@ public class myGridView extends GridView{
             if(myMainActivity.checkSelectionMode(MainActivity.MODE_NORMAL)){
                 return true;
             }else if(myMainActivity.checkSelectionMode(MainActivity.MODE_SELECTION)){
-                PointF pos = new PointF(ev.getX(), ev.getY());
-                long downTime = SystemClock.uptimeMillis();
-                long eventTime = downTime + 1;
-                MotionEvent mEvent = MotionEvent.obtain(downTime, eventTime, MotionEvent.ACTION_DOWN, pos.x, pos.y, 0);
+                if(holdFlag) {
+                    PointF pos = new PointF(ev.getX(), ev.getY());
+                    generateFakeEvent(pos, MotionEvent.ACTION_DOWN);
+                    if (selectionStartItem == -1) {
+                        selectionStartItem = mGetNowMoveItem(pos);
+                    }
+                    // Layoutの関係で-1が返ってくるかもしれないので対策
+                    int tmpItem = mGetNowMoveItem(pos);
+                    if (tmpItem >= 0) {
+                        selectionEndItem = tmpItem;
+                    }
 
-                //myMainActivity.itemList.get()
+                    //Log.i("pos", selectionStartItem+","+selectionEndItem);
 
+                    if (selectionStartItem != -1 && selectionEndItem != -1) {
+                        mSetSelection(selectionStartItem, selectionEndItem);
+                    }
 
-                return false;
+                    return false;
+                }
+                return true;
             }
         }
         return true;
@@ -204,7 +243,6 @@ public class myGridView extends GridView{
             // ここで1本残っているのは，countが2のとき
             if (count == 2 && holdFlag) {
                 myMainActivity.setSelectionMode(MainActivity.MODE_SELECTION);
-                holdFlag = false;
 
                 // 残っている指の下にタッチダウンを発生させる
                 for(int i=0; i<HOLDFINGER; i++){
@@ -212,27 +250,57 @@ public class myGridView extends GridView{
                         int mPointerIndex = ev.findPointerIndex(mPointerID[i]);
                         PointF p = new PointF(ev.getX(mPointerIndex), ev.getY(mPointerIndex));
                         generateFakeEvent(p, MotionEvent.ACTION_DOWN);
-                        selectionStartItem = myMainActivity.touchItem;
-
+                        if(selectionStartItem == -1) {
+                            selectionStartItem = mGetNowMoveItem(p);
+                            selectionEndItem = selectionStartItem;
+                            if(selectionStartItem != -1 && selectionEndItem != -1) {
+                                mSetSelection(selectionStartItem, selectionEndItem);
+                            }
+                        }
+                        break;
+                    }
+                }
+                return false;
+            }
+        }else if(myMainActivity.checkSelectionMode(MainActivity.MODE_SELECTION)){
+            if (count == 2 && holdFlag) {
+                // 残っている指の下にタッチダウンを発生させる
+                for(int i=0; i<HOLDFINGER; i++){
+                    if(mPointerID[i] != -1){
+                        int mPointerIndex = ev.findPointerIndex(mPointerID[i]);
+                        PointF p = new PointF(ev.getX(mPointerIndex), ev.getY(mPointerIndex));
+                        generateFakeEvent(p, MotionEvent.ACTION_DOWN);
+                        if(selectionStartItem == -1) {
+                            selectionStartItem = mGetNowMoveItem(p);
+                        }
                         break;
                     }
                 }
 
+                for(int i=0; i<myMainActivity.selectedItem.length; i++){
+                    tmpSelectItem[i] = myMainActivity.selectedItem[i];
+                }
                 return false;
             }
-        }else if(myMainActivity.checkSelectionMode(MainActivity.MODE_SELECTION)){
             return false;
         }
         return true;
     }
     private boolean myGridViewActionUp(MotionEvent ev){
+        holdFlag = false;
+
         if(myMainActivity.checkSelectionMode(MainActivity.MODE_NORMAL)){
             return true;
         }else if(myMainActivity.checkSelectionMode(MainActivity.MODE_SELECTION)){
             PointF p = new PointF(ev.getX(), ev.getY());
-            generateFakeEvent(p, MotionEvent.ACTION_UP);
+            if(selectionStartItem != -1 || selectionEndItem != -1) {
+                selectionStartItem = -1;
+                selectionEndItem = -1;
+                return false;
+            }
             return true;
         }
+
         return true;
     }
 
@@ -249,33 +317,106 @@ public class myGridView extends GridView{
     }
 
     public void setSelectedItemLength(){
-        selectedItem = new boolean[this.getCount()];
+        myMainActivity.selectedItem = new boolean[this.getCount()];
+        tmpSelectItem = new boolean[this.getCount()];
     }
     public void setItemSelectedState(int position, boolean state, View itemView){
-        selectedItem[position] = state;
+        myMainActivity.selectedItem[position] = state;
         if(state){
             itemView.setBackgroundColor(Color.rgb(80, 80, 240));
         }else{
-            itemView.setBackgroundColor(Color.argb(0,255,255,255));
+            itemView.setBackgroundColor(Color.rgb(255, 255, 255));
+            if(myMainActivity.testModeFlag) {
+                myMainActivity.mShowQuestion(position, itemView);
+            }
+            /*
+            for(int i=0; i<myMainActivity.questionStartPoint.length; i++){
+                if(myMainActivity.questionStartPoint[i] == position){
+                    itemView.setBackgroundColor(Color.rgb(255,100,100));
+                    break;
+                }
+            }
+            */
         }
     }
-    private void setItemSelectedState(int position, boolean state){
-        selectedItem[position] = state;
-    }
+
     public boolean getItemSelectedState(int position){
-        return selectedItem[position];
+        return myMainActivity.selectedItem[position];
     }
+
     private int getColumnNum(){
         float layoutWidth = this.getMeasuredWidth();
-        float columnWidth = 150; // this.getColumnWidth();
+        float columnWidth = 160; // this.getColumnWidth();
         float holizontalSpace = 8; //this.getHorizontalSpacing();
+
 
         int count = (int)(layoutWidth/columnWidth);
         int mod = (int)(layoutWidth%columnWidth);
 
-        for(;mod/holizontalSpace < count;){
+        if(mod != 0) {
+            for (; mod / holizontalSpace < count; ) {
+                count--;
+            }
+        }else{
             count--;
         }
+
         return count;
+    }
+
+    private int mGetNowMoveItem(PointF pos){
+        int nowItem = -1;
+        for (int i = 0; i < this.getCount(); i++) {
+            //RelativeLayout r = (RelativeLayout) myMainActivity.selectedItemView.get(i);
+            RelativeLayout r = (RelativeLayout) this.getItemAtPosition(i);
+            RectF rect = new RectF(r.getLeft(), r.getTop(), r.getRight(), r.getBottom());
+            if (rect.contains(pos.x, pos.y)) {
+                nowItem = i;
+                break;
+            }
+        }
+        return nowItem;
+    }
+
+    private void mSetSelection(int start, int end){
+        int startX, startY, endX, endY;
+        int colNum = getColumnNum();
+
+        startX = start % colNum;
+        endX = end % colNum;
+        if(startX > endX){
+            int tmp = startX;
+            startX = endX;
+            endX = tmp;
+        }
+
+        startY = start / colNum;
+        endY = end / colNum;
+        if(startY > endY){
+            int tmp = startY;
+            startY = endY;
+            endY = tmp;
+        }
+
+        for(int i=0; i<this.getCount(); i++){
+            if(!tmpSelectItem[i]){
+                //RelativeLayout r = (RelativeLayout)myMainActivity.selectedItemView.get(i);
+                RelativeLayout r = (RelativeLayout) this.getItemAtPosition(i);
+                setItemSelectedState(i, false, r);
+            }
+        }
+
+        for(int i=startY; i<=endY; i++){
+            for(int j=startX; j<=endX; j++){
+                int pos = j+i*colNum;
+                //RelativeLayout r = (RelativeLayout)myMainActivity.selectedItemView.get(pos);
+                RelativeLayout r = (RelativeLayout) this.getItemAtPosition(pos);
+                setItemSelectedState(pos, true, r);
+                if(tmpSelectItem[pos]){tmpSelectItem[pos] = false;}
+            }
+        }
+
+
+
     }
 }

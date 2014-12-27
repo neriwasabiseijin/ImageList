@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -40,6 +39,7 @@ public class MyImageAdapter extends BaseAdapter{
             R.drawable.hue_ff40cf,
     };
     private ArrayList<Bitmap> mImageArray;
+    private ArrayList<View> mViewList;
 
     private static class ViewHolder{
         public ImageView myImageView;
@@ -47,18 +47,28 @@ public class MyImageAdapter extends BaseAdapter{
     }
 
     public MyImageAdapter(Context context){
-        mContext = context;
-        mLayoutInflater = LayoutInflater.from(context);
-        mImageArray = loadThumbnails();
+        mViewList = new ArrayList<View>();
+
         myMainActivity = (MainActivity)context;
+        mContext = context;
+        mImageArray = loadThumbnails();
+
+
+        mLayoutInflater = LayoutInflater.from(context);
     }
 
     public int getCount(){
+        //Log.i("size", mViewList.size()+"");
+        //return mViewList.size();
         return mImageArray.size();
     }
 
     public Object getItem(int position){
-        return mHueArray[position];
+        //return mImageArray.get(position);
+        //Log.i("getItem", position+",");
+        /*このへんあやしい*/
+        //return mViewList.get(position+1);
+        return (position<0 || mViewList.size()<=position) ? mViewList.get(0) : mViewList.get(position);
     }
 
     public long getItemId(int position){
@@ -79,45 +89,31 @@ public class MyImageAdapter extends BaseAdapter{
         }
 
         holder.myImageView.setImageBitmap(mImageArray.get(position));
-       // holder.myCheckBox.setChecked(true);
-        convertView.setId(position);
-        convertView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent ev) {
-                myMainActivity.touchItem = position;
-                Log.i("toucitem", ""+position+"\n"+v.getLeft()+","+v.getTop()+","+v.getRight()+","+v.getBottom());
-                /*
-                // return true するとMOVEが渡せるけど下のviewにイベントは流れない
-                int action = ev.getActionMasked();
-                switch(action){
-                    case MotionEvent.ACTION_DOWN:
-                        return true;
-                    case MotionEvent.ACTION_MOVE:
-                        if(ev.getPointerCount() == 1) {
-                            PointF touchPos = new PointF(ev.getX(), ev.getY());
-                            RectF viewRect = new RectF(v.getLeft(),v.getLeft(),v.getLeft(),v.getLeft());
-                            if(viewRect.contains(touchPos.x, touchPos.y)){
-                                return true;
-                            }
-                        }
-                }
-                */
-                return false;
-            }
-        });
 
+        convertView.setId(position);
+        boolean setIdFlag = true;
+        for(int i=0; i<mViewList.size(); i++){
+            if(mViewList.get(i).getId() == position){
+                setIdFlag = false;
+                break;
+            }
+        }
+        if(setIdFlag){
+            mViewList.add(convertView);
+        }
+
+        Log.i("add", "convertView:"+convertView.getId()+","+mViewList.size()+","+position+","+mImageArray.size());
         return convertView;
     }
 
     private ArrayList<Bitmap> loadThumbnails(){
         ArrayList<Bitmap> list = new ArrayList<Bitmap>();
 
-
         String sd_root = Get_SDroot.getMount_sd();
         File dir = new File(sd_root+"/IPLAB/img");
         File[] imgs = dir.listFiles();
 
-        if(!MainActivity.debugFlag) {
+        if(!myMainActivity.debugFlag) {
             if (imgs != null) {
                 for (int i = 0; i < imgs.length; i++) {
                     if (imgs[i].isFile()) {
@@ -148,7 +144,7 @@ public class MyImageAdapter extends BaseAdapter{
                                 }
 
                                 bitmap = BitmapFactory.decodeStream(fis, null, imageOptions2);
-                                Log.v("image", "Sample Size: 1/" + imageOptions2.inSampleSize);
+                                //Log.v("image", "Sample Size: 1/" + imageOptions2.inSampleSize);
                             } else {
                                 bitmap = BitmapFactory.decodeStream(fis);
                             }
@@ -168,6 +164,12 @@ public class MyImageAdapter extends BaseAdapter{
             }
         }
 
-        return list;
+        //return list;
+
+        ArrayList<Bitmap> testList35 = new ArrayList<Bitmap>();
+        for(int i=0; i<35; i++){
+            testList35.add(list.get(i));
+        }
+        return testList35;
     }
 }

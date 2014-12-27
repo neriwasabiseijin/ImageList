@@ -7,13 +7,13 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ListAdapter;
+import android.widget.RelativeLayout;
 
 /**
  * Created by neriwasabiseijin on 2014/12/14.
  */
 public class myGridView_LongTap extends GridView{
 
-    public boolean[] selectedItem;
     private MainActivity myMainActivity;
 
     public myGridView_LongTap(Context context, AttributeSet attrs) {
@@ -26,6 +26,23 @@ public class myGridView_LongTap extends GridView{
         super.setAdapter(adapter);
     }
 
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus){
+        super.onWindowFocusChanged(hasFocus);
+
+        //myMainActivity.selectedItemView = new ArrayList<Object>();
+        for(int i=0; i<this.getCount(); i++){
+            //myMainActivity.selectedItemView.add(this.getItemAtPosition(i));
+        }
+
+        for(int i=0; i<this.getCount(); i++){
+            //RelativeLayout r = (RelativeLayout)myMainActivity.selectedItemView.get(i);
+            RelativeLayout r = (RelativeLayout) this.getItemAtPosition(i);
+            setItemSelectedState(i, false, r);
+        }
+    }
+
+
     // 初期化
     private void myInit(Context context){
         myMainActivity = (MainActivity)context;
@@ -36,9 +53,10 @@ public class myGridView_LongTap extends GridView{
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 if (myMainActivity.checkSelectionMode(MainActivity.MODE_NORMAL)) {
                     myMainActivity.setSelectionMode(MainActivity.MODE_SELECTION);
-                    view.setBackgroundColor(Color.rgb(80, 80, 240));
+                    //view.setBackgroundColor(Color.rgb(80, 80, 240));
                     setItemSelectedState(position, true, view);
                 }
+
                 return true;
             }
         });
@@ -53,23 +71,27 @@ public class myGridView_LongTap extends GridView{
                         setItemSelectedState(position, false, view);
                     }
                 }
+
             }
         });
     }
 
     public void setSelectedItemLength(){
-        selectedItem = new boolean[this.getCount()];
+        myMainActivity.selectedItem = new boolean[this.getCount()];
     }
     public void setItemSelectedState(int position, boolean state, View itemView){
-        selectedItem[position] = state;
+        myMainActivity.selectedItem[position] = state;
         if(state){
             itemView.setBackgroundColor(Color.rgb(80, 80, 240));
         }else{
-            itemView.setBackgroundColor(Color.argb(0, 0, 0, 0));
+            itemView.setBackgroundColor(Color.rgb(255, 255, 255));
+            if(myMainActivity.testModeFlag) {
+                myMainActivity.mShowQuestion(position, itemView);
+            }
         }
     }
     public boolean getItemSelectedState(int position){
-        return selectedItem[position];
+        return myMainActivity.selectedItem[position];
     }
 
 }
