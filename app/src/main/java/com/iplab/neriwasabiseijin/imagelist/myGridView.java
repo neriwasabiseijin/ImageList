@@ -43,7 +43,6 @@ public class myGridView extends GridView{
         super(context, attrs);
         myInit(context);
 
-
     }
 
     @Override
@@ -65,9 +64,10 @@ public class myGridView extends GridView{
             setItemSelectedState(i, false, r);
         }
 
+        this.setBackgroundColor(Color.rgb(0,0,0));
+
 
     }
-
 
     @Override
     public boolean onTouchEvent(MotionEvent ev){
@@ -81,7 +81,7 @@ public class myGridView extends GridView{
 
         setMyPointerId(ev);
         if(myGridViewTouchEvent(ev)) {
-            return super.onTouchEvent(ev);
+            //return super.onTouchEvent(ev);
         }
         return true;
     }
@@ -298,6 +298,13 @@ public class myGridView extends GridView{
                 selectionEndItem = -1;
                 return false;
             }
+
+            //generateFakeEvent(p, MotionEvent.ACTION_DOWN);
+            int tmp =  mGetNowMoveItem(p);
+            if(tmp != -1) {
+                RelativeLayout r = (RelativeLayout) this.getItemAtPosition(tmp);
+                setItemSelectedState(tmp, !getItemSelectedState(tmp), r);
+            }
             return true;
         }
 
@@ -325,7 +332,8 @@ public class myGridView extends GridView{
         if(state){
             itemView.setBackgroundColor(Color.rgb(80, 80, 240));
         }else{
-            itemView.setBackgroundColor(Color.rgb(255, 255, 255));
+            //itemView.setBackgroundColor(Color.rgb(255, 255, 255));
+            itemView.setBackgroundColor(Color.rgb(0,0,0));
             if(myMainActivity.testModeFlag) {
                 myMainActivity.mShowQuestion(position, itemView);
             }

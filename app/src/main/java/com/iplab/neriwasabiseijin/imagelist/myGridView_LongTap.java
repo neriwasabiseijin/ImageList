@@ -40,6 +40,9 @@ public class myGridView_LongTap extends GridView{
             RelativeLayout r = (RelativeLayout) this.getItemAtPosition(i);
             setItemSelectedState(i, false, r);
         }
+
+        this.setBackgroundColor(Color.rgb(0,0,0));
+
     }
 
 
@@ -84,7 +87,8 @@ public class myGridView_LongTap extends GridView{
         if(state){
             itemView.setBackgroundColor(Color.rgb(80, 80, 240));
         }else{
-            itemView.setBackgroundColor(Color.rgb(255, 255, 255));
+            //itemView.setBackgroundColor(Color.rgb(255, 255, 255));
+            itemView.setBackgroundColor(Color.rgb(0, 0, 0));
             if(myMainActivity.testModeFlag) {
                 myMainActivity.mShowQuestion(position, itemView);
             }

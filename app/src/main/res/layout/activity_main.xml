@@ -4,10 +4,17 @@
     android:id="@+id/top"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
+    android:background="#000000"
     android:paddingTop="6dp"
     tools:context=".MainActivity">
 
+<!--    <Button
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:text="実験開始"
+    android:id="@+id/button_testStart"
+    android:background="#888888" />
+-->
     <com.iplab.neriwasabiseijin.imagelist.myGridView
         android:id="@+id/myGridView"
         android:layout_width="match_parent"
@@ -19,6 +26,7 @@
         android:horizontalSpacing="8dp"
         android:stretchMode="columnWidth"
         android:gravity="center"
+        android:background="#000000"
         >
     </com.iplab.neriwasabiseijin.imagelist.myGridView>
 </LinearLayout>

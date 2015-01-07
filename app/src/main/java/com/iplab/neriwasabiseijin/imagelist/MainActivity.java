@@ -77,8 +77,39 @@ public class MainActivity extends ActionBarActivity {
 
         myInit();
         if(testModeFlag) {
+
             mQuestionInit();
+
+            /*
+            Button expStartButton = (Button)findViewById(R.id.button_testStart);
+            expStartButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    v.setVisibility(View.GONE);
+                    if (testMode == TEST_LONG) {
+                        for (int i = 0; i < gridView_longTap.getCount(); i++) {
+                            RelativeLayout r = (RelativeLayout) gridView_longTap.getItemAtPosition(i);
+                            gridView_longTap.setItemSelectedState(i, false, r);
+                        }
+                    } else if (testMode == TEST_DOUBLE) {
+                        for (int i = 0; i < gridView_doubleTap.getCount(); i++) {
+                            RelativeLayout r = (RelativeLayout) gridView_doubleTap.getItemAtPosition(i);
+                            gridView_doubleTap.setItemSelectedState(i, false, r);
+                        }
+                    } else {
+                        for (int i = 0; i < gridView.getCount(); i++) {
+                            gridView.setVisibility(View.VISIBLE);
+                            RelativeLayout r = (RelativeLayout) gridView.getItemAtPosition(i);
+                            //gridView.setItemSelectedState(i, false, r);
+                            mShowQuestion(i, r);
+                            Log.i("hoge", "i"+i);
+                        }
+                    }
+                }
+            });
+            */
         }
+
     }
 
     @Override
@@ -141,7 +172,7 @@ public class MainActivity extends ActionBarActivity {
             debugFlag = true;
         }
 
-        Log.i("testmode", "mode:"+testMode+",debugF:"+debugFlag);
+        //Log.i("testmode", "mode:"+testMode+",debugF:"+debugFlag);
         if(Integer.parseInt(intent.getStringExtra("TESTFLAG")) == 0) {
             testModeFlag = true;
         }
@@ -156,6 +187,9 @@ public class MainActivity extends ActionBarActivity {
             gridView.HOLDFINGER = 3;
             gridView.myInit(this);
             questionView = gridView;
+
+//            gridView.setVisibility(View.INVISIBLE);
+
         }else if(testMode == TEST_2POINT){
             gridView = (myGridView)findViewById(R.id.myGridView);
             gridView.setAdapter(new MyImageAdapter(this));
@@ -293,6 +327,8 @@ public class MainActivity extends ActionBarActivity {
         mArrayShuffleInt(question);
         mSetQuestion();
 
+
+
         /*
         for(int i=0; i<question.length; i++){
             mSetQuestion();
@@ -301,14 +337,16 @@ public class MainActivity extends ActionBarActivity {
         */
     }
     public void mShowQuestion(int pos, View itemView){
+        //Log.i("item", itemView.toString());
         if(!questionEndFlag) {
             if (questionPos[pos]) {
                 int startPos = question[nowQuestion] % 9;
-
                 if (pos == questionStartPoint[startPos]) {
                     itemView.setBackgroundColor(Color.rgb(240, 80, 80));
+                    //Log.i("showQ", pos+",red");
                 } else {
                     itemView.setBackgroundColor(Color.rgb(240, 240, 0));
+                    //Log.i("showQ", pos+",y");
                 }
             }
         }
@@ -380,8 +418,5 @@ public class MainActivity extends ActionBarActivity {
         );
         tG.startTone(ToneGenerator.TONE_CDMA_ABBR_ALERT);
     }
-
-
-
 
 }

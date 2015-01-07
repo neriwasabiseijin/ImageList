@@ -1,11 +1,21 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
+    android:id="@+id/top"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
+    android:background="#000000"
     android:paddingTop="8dp"
     tools:context=".MainActivity">
+
+    <!--
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:text="実験開始"
+        android:id="@+id/button_testStart"
+        android:background="#888888" />
+        -->
 
     <com.iplab.neriwasabiseijin.imagelist.myGridView_LongTap
         android:id="@+id/myGridView_longTap"

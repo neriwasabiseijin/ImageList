@@ -45,6 +45,9 @@ public class myGridView_DoubleTap  extends GridView {
             RelativeLayout r = (RelativeLayout) this.getItemAtPosition(i);
             setItemSelectedState(i, false, r);
         }
+
+        this.setBackgroundColor(Color.rgb(0,0,0));
+
     }
 
     @Override
@@ -76,11 +79,13 @@ public class myGridView_DoubleTap  extends GridView {
         myMainActivity.selectedItem = new boolean[this.getCount()];
     }
     public void setItemSelectedState(int position, boolean state, View itemView){
+        //Log.i("view", itemView+"");
         myMainActivity.selectedItem[position] = state;
         if(state){
             itemView.setBackgroundColor(Color.rgb(80, 80, 240));
         }else{
-            itemView.setBackgroundColor(Color.rgb(255, 255, 255));
+            //itemView.setBackgroundColor(Color.rgb(255, 255, 255));
+            itemView.setBackgroundColor(Color.rgb(0, 0, 0));
             if(myMainActivity.testModeFlag) {
                 myMainActivity.mShowQuestion(position, itemView);
             }

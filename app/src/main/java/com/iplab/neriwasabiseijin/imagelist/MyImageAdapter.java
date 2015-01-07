@@ -100,9 +100,9 @@ public class MyImageAdapter extends BaseAdapter{
         }
         if(setIdFlag){
             mViewList.add(convertView);
+            Log.i("add", "convertView:"+convertView.getId()+","+mViewList.size()+","+position+","+mImageArray.size());
         }
 
-        Log.i("add", "convertView:"+convertView.getId()+","+mViewList.size()+","+position+","+mImageArray.size());
         return convertView;
     }
 

@@ -8,6 +8,43 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context="com.iplab.neriwasabiseijin.paint3pointtouch.StartActivity">
 
+    <!--
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_height="250px"
+            android:text="実験開始"
+            android:id="@+id/button_testStart"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+        <RadioGroup android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:id="@+id/RadioGroup"
+            android:layout_below="@+id/button_testStart">
+            <RadioButton android:text="3point"
+                android:id="@+id/RadioButton_3point"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content">
+            </RadioButton>
+            <RadioButton android:text="2point"
+                android:id="@+id/RadioButtoni_2point"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+            </RadioButton>
+            <RadioButton android:text="longTap"
+                android:id="@+id/RadioButton_long"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+            </RadioButton>
+            <RadioButton android:text="doubleTap"
+                android:id="@+id/RadioButton_double"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+            </RadioButton>
+        </RadioGroup>
+        -->
+
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -44,12 +81,8 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
-    <CheckBox
-        android:id="@+id/debug_flag"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="debug_flag"
-        android:layout_below="@+id/button_doubleTap"/>
+
+
 
     <EditText
         android:id="@+id/subjectName"
@@ -64,7 +97,16 @@
         android:textSize="20sp"
         android:background="#555555"
         android:textColor="#ffffff"
-        android:layout_below="@+id/debug_flag"/>
+        android:layout_below="@+id/button_doubleTap"/>
+
+<!--    android:layout_below="@+id/RadioGroup"/>-->
+
+    <CheckBox
+        android:id="@+id/debug_flag"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="debug_flag"
+        android:layout_below="@+id/subjectName"/>
 
     <CheckBox
         android:id="@+id/test_flag"
@@ -72,7 +114,7 @@
         android:layout_height="wrap_content"
         android:text="test_flag"
         android:checked="true"
-        android:layout_below="@+id/subjectName"/>
+        android:layout_below="@+id/debug_flag"/>
 
 
 

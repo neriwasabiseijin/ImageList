@@ -47,7 +47,7 @@ public class StartActivity extends ActionBarActivity {
                 @Override
                 public void onClick(View v){
                     // インテントのインスタンス生成
-                    Intent intent = new Intent(StartActivity.this, MainActivity.class);
+                    Intent intent = new Intent(StartActivity.this, TestStart.class);
                     // 値引き渡しの設定
                     intent.putExtra("MODE", "0");
 
@@ -72,7 +72,7 @@ public class StartActivity extends ActionBarActivity {
                 @Override
                 public void onClick(View v){
                     // インテントのインスタンス生成
-                    Intent intent = new Intent(StartActivity.this, MainActivity.class);
+                    Intent intent = new Intent(StartActivity.this, TestStart.class);
                     // 値引き渡しの設定
                     intent.putExtra("MODE", "1");
 
@@ -97,7 +97,7 @@ public class StartActivity extends ActionBarActivity {
                 @Override
                 public void onClick(View v){
                     // インテントのインスタンス生成
-                    Intent intent = new Intent(StartActivity.this, MainActivity.class);
+                    Intent intent = new Intent(StartActivity.this, TestStart.class);
                     // 値引き渡しの設定
                     intent.putExtra("MODE", "2");
 
@@ -122,7 +122,7 @@ public class StartActivity extends ActionBarActivity {
                 @Override
                 public void onClick(View v){
                     // インテントのインスタンス生成
-                    Intent intent = new Intent(StartActivity.this, MainActivity.class);
+                    Intent intent = new Intent(StartActivity.this, TestStart.class);
                     // 値引き渡しの設定
                     intent.putExtra("MODE", "3");
 
