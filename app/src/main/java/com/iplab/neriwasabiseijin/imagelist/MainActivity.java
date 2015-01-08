@@ -43,6 +43,7 @@ public class MainActivity extends ActionBarActivity {
 
     // 選択された場所を保存
     public boolean[] selectedItem;
+    public boolean[] beforeSelectedItem;
 
     private ActionBar actionBar;
     private Menu myMenu;
@@ -74,6 +75,8 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        csv += getNowTime() + "," + "TEST_APP_START" + "\n";
 
         myInit();
         if(testModeFlag) {
@@ -109,7 +112,6 @@ public class MainActivity extends ActionBarActivity {
             });
             */
         }
-
     }
 
     @Override
@@ -168,7 +170,23 @@ public class MainActivity extends ActionBarActivity {
         Intent intent = getIntent();
         testMode = Integer.parseInt(intent.getStringExtra("MODE"));
 
+        switch(testMode){
+            case TEST_GRIDVIEW:
+                csv += getNowTime() + "," + "TEST_MODE" + "," + "3POINT" + "\n";
+                break;
+            case TEST_2POINT:
+                csv += getNowTime() + "," + "TEST_MODE" + "," + "2POINT" + "\n";
+                break;
+            case TEST_LONG:
+                csv += getNowTime() + "," + "TEST_MODE" + "," + "LONG" + "\n";
+                break;
+            case TEST_DOUBLE:
+                csv += getNowTime() + "," + "TEST_MODE" + "," + "DOUBLE" + "\n";
+                break;
+        }
+
         if(Integer.parseInt(intent.getStringExtra("DEBUG")) == 0){
+            csv += getNowTime() + "," + "DEBUGMODE" + "\n";
             debugFlag = true;
         }
 
@@ -222,6 +240,16 @@ public class MainActivity extends ActionBarActivity {
     public void setSelectionMode(int mode){
         if(selectionMode != mode) {
             selectionMode = mode;
+
+            switch (mode){
+                case MODE_NORMAL:
+                    csv += getNowTime() + "," + "MODE_NORMAL" + "\n";
+                    break;
+                case MODE_SELECTION:
+                    csv += getNowTime() + "," + "MODE_SELECTION" + "\n";
+                    break;
+            }
+
             changeActionBar();
         }
     }
@@ -237,6 +265,7 @@ public class MainActivity extends ActionBarActivity {
             case MODE_SELECTION:
                 bgColor = R.color.action_bar_bg_blue;
                 getMenuInflater().inflate(R.menu.menu_main_selected, myMenu);
+                csv += getNowTime() + "," + "ACTIONBAR_OPEN" + "\n";
                 break;
         }
         Drawable bgDrawable = getApplicationContext().getResources().getDrawable(bgColor);
@@ -244,6 +273,14 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void clickMenuCopy(){
+        csv += getNowTime() + "," + "COPY_BUTTON_CLICKED" + "\n";
+
+        csv += getNowTime() + "," + "SELECTED_ITEMS";
+        for(int i=0; i<selectedItem.length; i++){
+            if(selectedItem[i]){csv += "," + i;}
+        }
+        csv += "," + "END\n";
+
         if(testModeFlag) {
             mCheckAnswer();
         }
@@ -279,10 +316,27 @@ public class MainActivity extends ActionBarActivity {
         String sd_root = Get_SDroot.getMount_sd();
         Date date = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd'_'kk_mm_ss");
-        String filename = subjectName + "_" + sdf.format(date);
+
+        String testtype = "";
+        switch (testMode){
+            case TEST_GRIDVIEW:
+                testtype = "3point";
+                break;
+            case TEST_2POINT:
+                testtype = "2point";
+                break;
+            case TEST_LONG:
+                testtype = "long";
+                break;
+            case TEST_DEBUG:
+                testtype = "double";
+                break;
+        }
+
+        String filename = testtype + "_" + subjectName + "_" + sdf.format(date);
         String file = sd_root + "/IPLAB/ImageList/" + subjectName + "/" + filename + ".csv";
 
-        csv += getNowTime() + "," + "CSV_CREATE" + "," + filename + ".csv";
+        csv += getNowTime() + "," + "CSV_CREATE" + "," + filename + ".csv" + "\n";
 
         File f = new File(file);
         File dir = f.getParentFile();
@@ -325,6 +379,12 @@ public class MainActivity extends ActionBarActivity {
         questionEndFlag = false;
 
         mArrayShuffleInt(question);
+        csv += getNowTime() + "," + "QUESTION_SET";
+        for(int i=0; i<question.length; i++){
+            csv += "," + question[i];
+        }
+        csv += "\n";
+
         mSetQuestion();
 
 
@@ -368,6 +428,16 @@ public class MainActivity extends ActionBarActivity {
                 //Log.i("hoge", question[nowQuestion]+","+questionType+","+startPos+",,,,"+qnum);
             }
         }
+
+        csv += getNowTime() + "," + "QUESTION" + "," + nowQuestion + "," + startPos + "\n";
+        csv += getNowTime() + "," + "QUESTION_ITEM";
+        for(int i=0; i< questionPos.length; i++){
+            if(questionPos[i]){
+                csv += "," + i;
+            }
+        }
+        csv += "," + "END\n";
+
     }
     public void mCheckAnswer(){
         boolean correctFlag = true;
@@ -379,8 +449,10 @@ public class MainActivity extends ActionBarActivity {
         }
 
         if(correctFlag){
+            csv += getNowTime() + "," + "ANSWER" + "," + "CORRECT" + "\n";
             mNextQuestion();
         }else{
+            csv += getNowTime() + "," + "ANSWER" + "," + "FALSE" +"\n";
             mBeep();
         }
 
@@ -389,6 +461,7 @@ public class MainActivity extends ActionBarActivity {
         nowQuestion++;
         if(nowQuestion < question.length){
             Log.i("q", nowQuestion+"");
+
             mSetQuestion();
         }else{
             Log.i("q", "endddd");
@@ -397,6 +470,9 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void mQuestionEnd(){
+        if(!questionEndFlag){
+            mExportCSV();
+        }
         questionEndFlag = true;
 
         // インテントのインスタンス生成

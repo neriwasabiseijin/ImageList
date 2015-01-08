@@ -8,7 +8,6 @@ import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ListAdapter;
 import android.widget.RelativeLayout;
@@ -101,6 +100,7 @@ public class myGridView extends GridView{
         selectionStartItem = -1;
         selectionEndItem = -1;
 
+        /*
         setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -113,6 +113,7 @@ public class myGridView extends GridView{
                 }
             }
         });
+        */
     }
 
     // マルチタッチ用ポインタと，3点タッチ開始点候補の処理
@@ -169,18 +170,56 @@ public class myGridView extends GridView{
 
         switch(action){
             case MotionEvent.ACTION_DOWN:
+                makeCSVonTouch(ev, "ACTION_DOWN");
                 return myGridViewActionDown(ev);
             case MotionEvent.ACTION_POINTER_DOWN:
+                makeCSVonTouch(ev, "ACTION_POINTER_DOWN");
                 return myGridViewActionPointerDown(ev);
             case MotionEvent.ACTION_MOVE:
+                makeCSVonTouch(ev, "ACTION_MOVE");
                 return myGridViewActionMove(ev);
             case MotionEvent.ACTION_POINTER_UP:
+                makeCSVonTouch(ev, "ACTION_POINTER_UP");
                 return myGridViewActionPointerUp(ev);
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
+                makeCSVonTouch(ev, "ACTION_UP");
                 return myGridViewActionUp(ev);
         }
+
         return true;
+    }
+
+    private void makeCSVonTouch(MotionEvent ev, String act){
+        int count = ev.getPointerCount();
+        int pointerIndex = ev.getActionIndex();
+        int pointerId = ev.getPointerId(pointerIndex);
+
+        myMainActivity.csv += myMainActivity.getNowTime() + "," + "TOUCH_EVENT" + "," + act
+                + "," + pointerId + "," + ev.getX(pointerIndex) + "," + ev.getY(pointerIndex)
+                + "," + ev.getSize(pointerIndex) + "," + count + "\n";
+
+        if(myMainActivity.selectionMode == myMainActivity.MODE_SELECTION){
+            boolean changeStateFlag = false;
+            for(int i=0; i<this.getCount(); i++){
+                if(myMainActivity.selectedItem[i] != myMainActivity.beforeSelectedItem[i]){
+                    changeStateFlag = true;
+                    break;
+                }
+            }
+            //Log.i("flag", changeStateFlag + "");
+            if(changeStateFlag) {
+                myMainActivity.csv += myMainActivity.getNowTime() + "," + "SELECT_ITEM_MOVE";
+                for (int i = 0; i < this.getCount(); i++) {
+                    if (myMainActivity.selectedItem[i]) {
+                        myMainActivity.csv += "," + i;
+                    }
+                    myMainActivity.beforeSelectedItem[i] = myMainActivity.selectedItem[i];
+                }
+                myMainActivity.csv += "," + "END\n";
+            }
+        }
+
     }
 
     private boolean myGridViewActionDown(MotionEvent ev){
@@ -195,11 +234,13 @@ public class myGridView extends GridView{
         int count = ev.getPointerCount();
         if(myMainActivity.checkSelectionMode(MainActivity.MODE_NORMAL)){
             if (count == HOLDFINGER) {
+                myMainActivity.csv += myMainActivity.getNowTime() + "," + "HOLD_FINGER" + "\n";
                 holdFlag = true;
             }
             return true;
         }else if(myMainActivity.checkSelectionMode(MainActivity.MODE_SELECTION)){
             if (count == HOLDFINGER) {
+                myMainActivity.csv += myMainActivity.getNowTime() + "," + "HOLD_FINGER" + "\n";
                 holdFlag = true;
             }
             return false;
@@ -255,6 +296,7 @@ public class myGridView extends GridView{
                             selectionEndItem = selectionStartItem;
                             if(selectionStartItem != -1 && selectionEndItem != -1) {
                                 mSetSelection(selectionStartItem, selectionEndItem);
+                                myMainActivity.csv += myMainActivity.getNowTime() + "," + "SELECTION_START" + "," + selectionStartItem + "\n";
                             }
                         }
                         break;
@@ -264,6 +306,10 @@ public class myGridView extends GridView{
             }
         }else if(myMainActivity.checkSelectionMode(MainActivity.MODE_SELECTION)){
             if (count == 2 && holdFlag) {
+                for(int i=0; i<myMainActivity.selectedItem.length; i++){
+                    tmpSelectItem[i] = myMainActivity.selectedItem[i];
+                }
+
                 // 残っている指の下にタッチダウンを発生させる
                 for(int i=0; i<HOLDFINGER; i++){
                     if(mPointerID[i] != -1){
@@ -272,14 +318,13 @@ public class myGridView extends GridView{
                         generateFakeEvent(p, MotionEvent.ACTION_DOWN);
                         if(selectionStartItem == -1) {
                             selectionStartItem = mGetNowMoveItem(p);
+                            mSetSelection(selectionStartItem, selectionStartItem);
+                            myMainActivity.csv += myMainActivity.getNowTime() + "," + "SELECTION_START" + "," + selectionStartItem + "\n";
                         }
                         break;
                     }
                 }
 
-                for(int i=0; i<myMainActivity.selectedItem.length; i++){
-                    tmpSelectItem[i] = myMainActivity.selectedItem[i];
-                }
                 return false;
             }
             return false;
@@ -294,6 +339,7 @@ public class myGridView extends GridView{
         }else if(myMainActivity.checkSelectionMode(MainActivity.MODE_SELECTION)){
             PointF p = new PointF(ev.getX(), ev.getY());
             if(selectionStartItem != -1 || selectionEndItem != -1) {
+                myMainActivity.csv += myMainActivity.getNowTime() + "," + "SELECTION_END" + "," + selectionStartItem + "," + selectionEndItem + "\n";
                 selectionStartItem = -1;
                 selectionEndItem = -1;
                 return false;
@@ -304,6 +350,7 @@ public class myGridView extends GridView{
             if(tmp != -1) {
                 RelativeLayout r = (RelativeLayout) this.getItemAtPosition(tmp);
                 setItemSelectedState(tmp, !getItemSelectedState(tmp), r);
+                //myMainActivity.csv += myMainActivity.getNowTime() + "," + "SELECT_ITEM_TOUCH" + "," + tmp + "\n";
             }
             return true;
         }
@@ -325,13 +372,16 @@ public class myGridView extends GridView{
 
     public void setSelectedItemLength(){
         myMainActivity.selectedItem = new boolean[this.getCount()];
+        myMainActivity.beforeSelectedItem = new boolean[this.getCount()];
         tmpSelectItem = new boolean[this.getCount()];
     }
     public void setItemSelectedState(int position, boolean state, View itemView){
         myMainActivity.selectedItem[position] = state;
         if(state){
+            //myMainActivity.csv += myMainActivity.getNowTime() + "," + "SELECTSTATE_CHANGE" + "," + position + "," + "TRUE" + "\n";
             itemView.setBackgroundColor(Color.rgb(80, 80, 240));
         }else{
+            //myMainActivity.csv += myMainActivity.getNowTime() + "," + "SELECTSTATE_CHANGE" + "," + position + "," + "FALSE" + "\n";
             //itemView.setBackgroundColor(Color.rgb(255, 255, 255));
             itemView.setBackgroundColor(Color.rgb(0,0,0));
             if(myMainActivity.testModeFlag) {
@@ -424,7 +474,14 @@ public class myGridView extends GridView{
             }
         }
 
-
-
+        /*
+        myMainActivity.csv += myMainActivity.getNowTime() + "," + "SELECT_ITEM_MOVE";
+        for(int i=0; i<this.getCount(); i++){
+            if(getItemSelectedState(i)){
+                myMainActivity.csv += "," + i;
+            }
+        }
+        myMainActivity.csv += "," + "END\n";
+*/
     }
 }

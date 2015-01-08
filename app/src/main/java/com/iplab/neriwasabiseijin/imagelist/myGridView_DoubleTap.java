@@ -64,11 +64,14 @@ public class myGridView_DoubleTap  extends GridView {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if(myMainActivity.checkSelectionMode(MainActivity.MODE_SELECTION)){
+
                     if(!getItemSelectedState(position)) {
                         setItemSelectedState(position, true, view);
                     }else{
                         setItemSelectedState(position, false, view);
                     }
+
+                    myMainActivity.csv += myMainActivity.getNowTime() + "," + "ITEM_CLICKED" + "," + position + "," + getItemSelectedState(position) + "\n";
                 }
 
             }
@@ -77,6 +80,7 @@ public class myGridView_DoubleTap  extends GridView {
 
     public void setSelectedItemLength(){
         myMainActivity.selectedItem = new boolean[this.getCount()];
+        myMainActivity.beforeSelectedItem = new boolean[this.getCount()];
     }
     public void setItemSelectedState(int position, boolean state, View itemView){
         //Log.i("view", itemView+"");
@@ -117,15 +121,78 @@ public class myGridView_DoubleTap  extends GridView {
 
     @Override
     public boolean onTouchEvent(MotionEvent ev){
+        makeCSVonTouch(ev);
         gestureDetector.onTouchEvent(ev);
         return super.onTouchEvent(ev);
     }
+
+    private void makeCSVonTouch(MotionEvent ev){
+        int count = ev.getPointerCount();
+        int pointerIndex = ev.getActionIndex();
+        int pointerId = ev.getPointerId(pointerIndex);
+        int action = ev.getActionMasked();
+        String act = "";
+
+        switch (action){
+            case MotionEvent.ACTION_DOWN:
+                act = "ACTION_DOWN";
+                break;
+            case MotionEvent.ACTION_POINTER_DOWN:
+                act = "ACTION_POINTER_DOWN";
+                break;
+            case MotionEvent.ACTION_MOVE:
+                act = "ACTION_MOVE";
+                break;
+            case MotionEvent.ACTION_POINTER_UP:
+                act = "ACTION_POINTER_UP";
+                break;
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:
+                act = "ACTION_UP";
+                break;
+        }
+
+
+        myMainActivity.csv += myMainActivity.getNowTime() + "," + "TOUCH_EVENT" + "," + act
+                + "," + pointerId + "," + ev.getX(pointerIndex) + "," + ev.getY(pointerIndex)
+                + "," + ev.getSize(pointerIndex) + "," + count + "\n";
+
+        if(myMainActivity.selectionMode == myMainActivity.MODE_SELECTION){
+            boolean changeStateFlag = false;
+            for(int i=0; i<this.getCount(); i++){
+                if(myMainActivity.selectedItem[i] != myMainActivity.beforeSelectedItem[i]){
+                    changeStateFlag = true;
+                    break;
+                }
+            }
+            //Log.i("flag", changeStateFlag + "");
+            if(changeStateFlag) {
+                myMainActivity.csv += myMainActivity.getNowTime() + "," + "SELECT_ITEM_MOVE";
+                for (int i = 0; i < this.getCount(); i++) {
+                    if (myMainActivity.selectedItem[i]) {
+                        myMainActivity.csv += "," + i;
+                    }
+                    myMainActivity.beforeSelectedItem[i] = myMainActivity.selectedItem[i];
+                }
+                myMainActivity.csv += "," + "END\n";
+            }
+        }
+
+    }
+
+
 
     private final GestureDetector.SimpleOnGestureListener onGestureListener = new GestureDetector.SimpleOnGestureListener(){
         @Override
         public boolean onDoubleTap(MotionEvent ev) {
             if (myMainActivity.checkSelectionMode(MainActivity.MODE_NORMAL)) {
                 myMainActivity.setSelectionMode(MainActivity.MODE_SELECTION);
+
+                PointF pos = new PointF(ev.getX(), ev.getY());
+                int item = mGetNowMoveItem(pos);
+                if(item != -1) {
+                    myMainActivity.csv += myMainActivity.getNowTime() + "," + "DOUBLE_TAP" + "," + item + "\n";
+                }
             }
             return true;
         }

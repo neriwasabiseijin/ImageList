@@ -12,9 +12,6 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -38,6 +35,45 @@ public class MyImageAdapter extends BaseAdapter{
             R.drawable.hue_9f40ff,
             R.drawable.hue_ff40cf,
     };
+
+    private Integer[] mImgIdArray = {
+            R.drawable.i1,
+            R.drawable.i2,
+            R.drawable.i3,
+            R.drawable.i4,
+            R.drawable.i5,
+            R.drawable.i6,
+            R.drawable.i7,
+            R.drawable.i8,
+            R.drawable.i9,
+            R.drawable.i10,
+            R.drawable.i11,
+            R.drawable.i12,
+            R.drawable.i13,
+            R.drawable.i14,
+            R.drawable.i15,
+            R.drawable.i16,
+            R.drawable.i17,
+            R.drawable.i18,
+            R.drawable.i19,
+            R.drawable.i20,
+            R.drawable.i21,
+            R.drawable.i22,
+            R.drawable.i23,
+            R.drawable.i24,
+            R.drawable.i25,
+            R.drawable.i26,
+            R.drawable.i27,
+            R.drawable.i28,
+            R.drawable.i29,
+            R.drawable.i30,
+            R.drawable.i31,
+            R.drawable.i32,
+            R.drawable.i33,
+            R.drawable.i34,
+            R.drawable.i35,
+    };
+
     private ArrayList<Bitmap> mImageArray;
     private ArrayList<View> mViewList;
 
@@ -114,6 +150,7 @@ public class MyImageAdapter extends BaseAdapter{
         File[] imgs = dir.listFiles();
 
         if(!myMainActivity.debugFlag) {
+            /*
             if (imgs != null) {
                 for (int i = 0; i < imgs.length; i++) {
                     if (imgs[i].isFile()) {
@@ -157,6 +194,10 @@ public class MyImageAdapter extends BaseAdapter{
                         }
                     }
                 }
+            }
+            */
+            for (int i = 0; i < 35; i++) {
+                list.add(BitmapFactory.decodeResource(mContext.getResources(), mImgIdArray[i]));
             }
         }else{
             for (int i = 0; i < imgs.length; i++) {
