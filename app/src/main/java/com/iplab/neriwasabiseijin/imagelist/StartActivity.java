@@ -22,6 +22,13 @@ public class StartActivity extends ActionBarActivity {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_start);
 
+            Intent before = getIntent();
+            String subName = before.getStringExtra("SUBJECTNAME");
+            if(subName != null){
+                EditText eT = (EditText)findViewById(R.id.subjectName);
+                eT.setText(subName);
+            }
+
             final CheckBox debug_flag_check = (CheckBox)findViewById(R.id.debug_flag);
             /*
             debug_flag_check.setOnClickListener(new View.OnClickListener() {

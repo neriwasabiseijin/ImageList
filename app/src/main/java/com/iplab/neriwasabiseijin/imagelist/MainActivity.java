@@ -20,7 +20,6 @@ import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-
 public class MainActivity extends ActionBarActivity {
     static final int IMGNUM = 35;
 
@@ -69,7 +68,6 @@ public class MainActivity extends ActionBarActivity {
     public int nowQuestion;
     public View questionView;
     private boolean questionEndFlag = false;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -328,7 +326,7 @@ public class MainActivity extends ActionBarActivity {
             case TEST_LONG:
                 testtype = "long";
                 break;
-            case TEST_DEBUG:
+            case TEST_DOUBLE:
                 testtype = "double";
                 break;
         }
@@ -429,7 +427,9 @@ public class MainActivity extends ActionBarActivity {
             }
         }
 
-        csv += getNowTime() + "," + "QUESTION" + "," + nowQuestion + "," + startPos + "\n";
+        actionBar.setTitle((nowQuestion+1) + "/" + question.length);
+
+        csv += getNowTime() + "," + "QUESTION" + "," + nowQuestion + "," + questionStartPoint[startPos] + "," + width+"*"+width + "\n";
         csv += getNowTime() + "," + "QUESTION_ITEM";
         for(int i=0; i< questionPos.length; i++){
             if(questionPos[i]){
@@ -478,7 +478,7 @@ public class MainActivity extends ActionBarActivity {
         // インテントのインスタンス生成
         Intent intent = new Intent(MainActivity.this, StartActivity.class);
         // 値引き渡しの設定
-        //intent.putExtra("MODE", "2");
+        intent.putExtra("SUBJECTNAME", subjectName);
 
         // 次の画面のアクティビティ起動
         startActivity(intent);
