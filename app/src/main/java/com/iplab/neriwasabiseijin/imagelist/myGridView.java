@@ -258,6 +258,7 @@ public class myGridView extends GridView{
                     generateFakeEvent(pos, MotionEvent.ACTION_DOWN);
                     if (selectionStartItem == -1) {
                         selectionStartItem = mGetNowMoveItem(pos);
+                        myMainActivity.csv += myMainActivity.getNowTime() + "," + "SELECTION_START" + "," + selectionStartItem + "\n";
                     }
                     // Layoutの関係で-1が返ってくるかもしれないので対策
                     int tmpItem = mGetNowMoveItem(pos);
